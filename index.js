@@ -42,7 +42,7 @@ app.post('/registration',upload.single('image'),(req,res)=>{
         res.render('user/success')
 
 })
-
+ 
 
 
 app.listen('3000',()=>{

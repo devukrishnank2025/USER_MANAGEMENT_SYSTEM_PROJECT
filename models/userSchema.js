@@ -22,7 +22,7 @@ const User = mongoose.Schema({
     },
     is_admin:{
         type:Number,
-        required:true
+        required:true,
     }
     })
 
