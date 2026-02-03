@@ -2,10 +2,11 @@
 
 <h1>User registration form</h1>
 
-<form action="/registration" method="post">
+<form action="/registration" method="post" enctype="multipart/form-data">
     <input type="text" name="name" placeholder="Enter name"> <br><br>
     <input type="email" name="email" placeholder="Enter Email"> <br><br>
     <input type="password" name="password" placeholder="Enter Password"> <br><br>
+    <input type="file" name="image" > <br><br>
     <input type="submit" value="register">
 </form>
 
