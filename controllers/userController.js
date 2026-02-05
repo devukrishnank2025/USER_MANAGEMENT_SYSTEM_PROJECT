@@ -96,4 +96,58 @@ const loadRegister = async (req,res)=>{
     }
   }
 
-module.exports = {loadRegister,registrationUser,verifyUser};
+  const loginLoad = async(req,res)=>{
+    try {
+      res.render('user/login');
+      
+    } catch (error) {
+      console.log(error.message);
+
+      
+    }
+  }
+
+  const loginVerifyUser = async(req,res)=>{
+    try {
+      const email=req.body.email;
+      const password= req.body.password;
+
+      const checkUser= await User.findOne({email:email});
+
+      if(checkUser){
+        const checkPass = await bcrypt.compare(password,checkUser.password);
+
+        if(checkPass){
+          if(checkUser.is_verified===0){
+            res.render('user/login',{message:'please verify your ac using email...'});
+          }else{
+            req.session.user_id= checkUser._id;
+            res.redirect('/home');
+          }
+        }else{
+            res.render('user/login',{message:'invalid credential...'});
+
+      }
+      }else{
+            res.render('user/login',{message:'invalid credential...'});
+
+      }
+      
+    } catch (error) {
+      console.log(error.message);
+
+      
+    }
+
+  }
+
+  const homeLoad = async(req,res)=>{
+    try {
+      res.render('pages/home');
+    } catch (error) {
+      console.log(error.message);
+      
+    }
+  }
+
+module.exports = {loadRegister,registrationUser,verifyUser,loginLoad,homeLoad,loginVerifyUser};

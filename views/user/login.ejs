@@ -1,0 +1,20 @@
+<%- include('../layout/header') %>
+
+
+<form action="/login" method="post">
+
+    <% if(typeof message!=='undefined'){
+       %> <p><%= message %></p> <%
+    }
+    %>
+    <input type="email" name="email" placeholder="Enter Email"><br><br>
+    <input type="password" name="password" placeholder="Enter Your password"><br><br>
+    <input type="submit" value="login">
+
+
+
+</form>
+
+
+
+<%- include('../layout/footer') %>
