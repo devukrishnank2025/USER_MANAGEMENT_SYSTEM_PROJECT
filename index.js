@@ -6,24 +6,18 @@ const userRoute = require('./routes/userRouter');
 mongoose.connect('mongodb://127.0.0.1:27017/userManagement_system')
 
 
-
-
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 
 
-
-app.set('view engine','ejs');
-app.set('views','./views');
-
+app.set('view engine', 'ejs');
+app.set('views', './views');
 
 
-
-app.use('/',userRoute)
-
+app.use('/', userRoute)
 
 
-app.listen('3000',()=>{
+app.listen('3000', () => {
     console.log('server has started');
 })

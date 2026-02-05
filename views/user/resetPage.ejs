@@ -1,0 +1,17 @@
+<%- include('../layout/header') %>
+
+
+    <form action="/forget-password" method="post">
+        <% if(typeof message!=='undefined' ){ %>
+            <p>
+                <%= message %>
+            </p>
+            <% } %>
+        <input type="password" name="password" placeholder="Enter New password"><br><br>
+        <input type="text" name="userId" value="<%= user_id %>">
+        <input type="submit" value="Reset Password">
+    </form>
+
+
+
+    <%- include('../layout/footer') %>

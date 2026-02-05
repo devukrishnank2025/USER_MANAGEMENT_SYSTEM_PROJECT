@@ -1,153 +1,280 @@
-const User =require('../models/userSchema');
-const bcrypt =require('bcrypt');
-const nodeMailer=require('nodemailer');
+const User = require('../models/userSchema');
+const bcrypt = require('bcrypt');
+const nodeMailer = require('nodemailer');
+const randomstring = require('randomstring');
+const config = require('../config/secretconfig')
 
 
 
-const securePassword= async(password)=>{
+const securePassword = async (password) => {
   try {
-    const spass = await bcrypt.hash(password,10);
+    const spass = await bcrypt.hash(password, 10);
     return spass;
-    
+
   } catch (error) {
-    
+
   }
 }
 
-const sendVerifyMail= async(name,email,user_id)=>{
+const sendVerifyMail = async (name, email, user_id) => {
 
   try {
-    const transporter = 
-    nodeMailer.createTransport({
-      host:'smtp.gmail.com',
-      port:587,
-      secure:false,
-      requireTLS:true,
-      auth:{
-        user:'devukrishnan228@gmail.com',
-        pass:'hnxa yhcs zcmd qhqb'
-      }
-    })
-  const mailOption={
-      from:'devukrishnan228@gmail.com',
+    const transporter =
+      nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+          user: config.gEmail,
+          pass: config.gPass
+        }
+      })
+    const mailOption = {
+      from: 'devukrishnan228@gmail.com',
       to: email,
-      subject:'for verification mail',
+      subject: 'for verification mail',
       html: `<p>
         Hi ${name}, please click here to
         <a href="http://localhost:3000/verify?id=${user_id}">verify</a>
       </p>`
     }
 
-       const info = await transporter.sendMail(mailOption);
-       console.log('mail send:'+info.response);
-       
-    
+    const info = await transporter.sendMail(mailOption);
+    console.log('mail send:' + info.response);
+
+
   } catch (error) {
     console.log(error.message);
-    
-    
+
+
   }
 }
 
-const loadRegister = async (req,res)=>{
-   try {
+const sendResetMail = async (name, email, token) => {
 
-     res.render('user/registration');
+  try {
+    const transporter =
+      nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        requireTLS: true,
+        auth: {
+          user: config.gEmail,
+          pass: config.gPass
+        }
+      })
+    const mailOption = {
+      from: 'devukrishnan228@gmail.com',
+      to: email,
+      subject: 'for resetPassword',
+      html: `<p>
+        Hi ${name}, please click here to
+        <a href="http://localhost:3000/forget-password?token=${token}">reset your password</a>
+      </p>`
+    }
 
-   } catch (error) {
-     
+    const info = await transporter.sendMail(mailOption);
+    console.log('mail send:' + info.response);
+
+
+  } catch (error) {
     console.log(error.message);
-   }
-   
-  }
-  const registrationUser = async(req,res)=>{
-  
-      const spassword = await securePassword(req.body.password);
-  
-      const user = new User({
-  
-  
-          name:req.body.name,
-          email:req.body.email,
-          image:req.file.filename,
-          password:spassword,
-          is_admin:0
 
-          })
-          const userData= await user.save();
-          if(userData){
-            sendVerifyMail(req.body.name,req.body.email,userData._id);
-          }
-          res.render('user/registration',{message:'the user has registered , you have to verify the email'})
+
+  }
+}
+
+const loadRegister = async (req, res) => {
+  try {
+
+    res.render('user/registration');
+
+  } catch (error) {
+
+    console.log(error.message);
   }
 
+}
+const registrationUser = async (req, res) => {
 
-  const verifyUser = async(req,res)=>{
-    try {
-      
-      const update = await User.updateOne({_id:req.query.id},{$set:{is_verified:1}})
-      
-      res.render('user/success');
+  const spassword = await securePassword(req.body.password);
 
-    } catch (error) {
-      console.log(error.message);
-      
-      
-    }
+  const user = new User({
+
+
+    name: req.body.name,
+    email: req.body.email,
+    image: req.file.filename,
+    password: spassword,
+    is_admin: 0
+
+  })
+  const userData = await user.save();
+  if (userData) {
+    sendVerifyMail(req.body.name, req.body.email, userData._id);
   }
+  res.render('user/registration', { message: 'the user has registered , you have to verify the email' })
+}
 
-  const loginLoad = async(req,res)=>{
-    try {
-      res.render('user/login');
-      
-    } catch (error) {
-      console.log(error.message);
 
-      
-    }
+const verifyUser = async (req, res) => {
+  try {
+
+    const update = await User.updateOne({ _id: req.query.id }, { $set: { is_verified: 1 } })
+
+    res.render('user/success');
+
+  } catch (error) {
+    console.log(error.message);
+
+
   }
+}
 
-  const loginVerifyUser = async(req,res)=>{
-    try {
-      const email=req.body.email;
-      const password= req.body.password;
+const loginLoad = async (req, res) => {
+  try {
+    res.render('user/login');
 
-      const checkUser= await User.findOne({email:email});
+  } catch (error) {
+    console.log(error.message);
 
-      if(checkUser){
-        const checkPass = await bcrypt.compare(password,checkUser.password);
 
-        if(checkPass){
-          if(checkUser.is_verified===0){
-            res.render('user/login',{message:'please verify your ac using email...'});
-          }else{
-            req.session.user_id= checkUser._id;
-            res.redirect('/home');
-          }
-        }else{
-            res.render('user/login',{message:'invalid credential...'});
+  }
+}
+
+const loginVerifyUser = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    const checkUser = await User.findOne({ email: email });
+
+    if (checkUser) {
+      const checkPass = await bcrypt.compare(password, checkUser.password);
+
+      if (checkPass) {
+        if (checkUser.is_verified === 0) {
+          res.render('user/login', { message: 'please verify your ac using email...' });
+        } else {
+          req.session.user_id = checkUser._id;
+          res.redirect('/home');
+        }
+      } else {
+        res.render('user/login', { message: 'invalid credential...' });
 
       }
-      }else{
-            res.render('user/login',{message:'invalid credential...'});
+    } else {
+      res.render('user/login', { message: 'invalid credential...' });
 
-      }
-      
-    } catch (error) {
-      console.log(error.message);
-
-      
     }
+
+  } catch (error) {
+    console.log(error.message);
+
 
   }
 
-  const homeLoad = async(req,res)=>{
-    try {
-      res.render('pages/home');
-    } catch (error) {
-      console.log(error.message);
-      
+}
+
+const homeLoad = async (req, res) => {
+  try {
+    res.render('pages/home');
+  } catch (error) {
+    console.log(error.message);
+
+  }
+}
+
+const logoutUser = async (req, res) => {
+  try {
+    req.session.user_id = false;
+    res.redirect('/login')
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+
+const forgetLoad = async (req, res) => {
+  try {
+    res.render('user/forget');
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+const forgetVerify = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const checkEmail = await User.findOne({ email: email });
+    if (checkEmail) {
+      const randomString = randomstring.generate();
+      const updateUser = await User.updateOne(checkEmail, { $set: { token: randomString } });
+      sendResetMail(checkEmail.name, checkEmail.email, randomString);
+      res.render('user/forget', { message: 'reset link sucessfully sent...' });
+    } else {
+      res.render('user/forget', { message: 'account is not found.. please check email' });
+
     }
+
+  } catch (error) {
+    console.log(error.message);
+
+  }
+}
+
+
+const resetPasswordLoad = async (req, res) => {
+  try {
+    const token = req.query.token;
+    const userData = await User.findOne({ token: token });
+    if (userData) {
+      res.render('user/resetPage', { user_id: userData._id });
+    } else {
+      res.render('404', { message: "can't reload your page,try again" })
+    }
+
+  } catch (error) {
+    console.log(error.message);
+
   }
 
-module.exports = {loadRegister,registrationUser,verifyUser,loginLoad,homeLoad,loginVerifyUser};
+}
+
+const resetPassword = async (req, res) => {
+  try {
+    const user_id = req.body.userId;
+    const password = req.body.password;
+    const securepassword = await securePassword(password);
+    const userData = await User.updateOne({ _id: user_id }, { $set: { password: securepassword } });
+    if (userData) {
+      const deleteToken= await User.updateOne({_id:user_id},{$unset:{token:''}});
+      res.render('user/login', { message: 'password reset done....' })
+    } else {
+      res.render('404', { message: "can't getting that" });
+    }
+
+
+  } catch (error) {
+    console.log(error.message);
+    console.log('here is the error');
+
+
+  }
+}
+
+module.exports = {
+  loadRegister,
+  registrationUser,
+  verifyUser,
+  loginLoad,
+  homeLoad,
+  loginVerifyUser,
+  logoutUser,
+  forgetVerify,
+  forgetLoad,
+  resetPasswordLoad,
+  resetPassword
+};
