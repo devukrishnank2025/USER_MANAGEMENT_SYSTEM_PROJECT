@@ -180,7 +180,15 @@ const loginVerifyUser = async (req, res) => {
 
 const homeLoad = async (req, res) => {
   try {
-    res.render('pages/home');
+
+    const userData=await User.findOne({_id:req.session.user_id});
+
+    if(userData){
+      res.render('pages/home',{user:userData});
+    }else{
+      res.render('404',{message:'cannot get the user'});
+    }
+    
   } catch (error) {
     console.log(error.message);
 
@@ -211,9 +219,14 @@ const forgetVerify = async (req, res) => {
     const checkEmail = await User.findOne({ email: email });
     if (checkEmail) {
       const randomString = randomstring.generate();
-      const updateUser = await User.updateOne(checkEmail, { $set: { token: randomString } });
+      const updateUser = await User.updateOne({email:checkEmail.email}, { $set: { token: randomString } });
       sendResetMail(checkEmail.name, checkEmail.email, randomString);
-      res.render('user/forget', { message: 'reset link sucessfully sent...' });
+      if(updateUser){
+        res.render('user/forget', { message: 'reset link sucessfully sent...' });
+      }else{
+        res.render('404',{message:'token not setting'})
+      }
+      
     } else {
       res.render('user/forget', { message: 'account is not found.. please check email' });
 
@@ -230,10 +243,13 @@ const resetPasswordLoad = async (req, res) => {
   try {
     const token = req.query.token;
     const userData = await User.findOne({ token: token });
+    console.log(userData);
+    
+    
     if (userData) {
       res.render('user/resetPage', { user_id: userData._id });
     } else {
-      res.render('404', { message: "can't reload your page,try again" })
+      res.render('404', { message: 'cannot load your page'});
     }
 
   } catch (error) {
@@ -284,6 +300,37 @@ const secondUserVerificationLink = async(req,res)=>{
     res.render('user/verification',{message:'cant send the email user not found'});
   }
 }
+const editUserLoad =async(req,res)=>{
+  const id= req.query.id;
+  const userData = await User.findOne({_id:id});
+  if(userData){
+    res.render('pages/edit',{user:userData});
+  }
+}
+
+const editUser = async(req,res)=>{
+  if(req.file){
+    const userData= await User.updateOne({_id:req.body.user_id},{$set:{
+      email:req.body.email,
+      name:req.body.name,
+      image:req.file.filename
+    }})
+    
+    if(userData){
+      res.redirect("/home")
+    }else{
+      res.render('404',{message:'not updated'})
+    }
+  }else{
+    const userData= await User.updateOne({_id:req.body.user_id},{$set:{
+      email:req.body.email,
+      name:req.body.name
+        }})
+    res.redirect('/home');
+  }
+}
+
+
 module.exports = {
   loadRegister,
   registrationUser,
@@ -297,5 +344,7 @@ module.exports = {
   resetPasswordLoad,
   resetPassword,
   secondUserVerification,
-  secondUserVerificationLink
+  secondUserVerificationLink,
+  editUserLoad,
+  editUser
 };

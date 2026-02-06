@@ -1,11 +1,13 @@
 const express = require('express');
 const userRoute = express();
 const upload = require('../multerFile/multer');
-const { loadRegister, registrationUser, verifyUser, loginLoad, homeLoad, loginVerifyUser, logoutUser, forgetLoad, forgetVerify, resetPasswordLoad, resetPassword,secondUserVerification,secondUserVerificationLink } = require('../controllers/userController');
 const session = require('express-session');
 const config = require('../config/secretconfig');
 const { checkSession, isLogin } = require('../middleware/auth');
 const nocache = require('nocache');
+const { loadRegister, registrationUser, verifyUser, loginLoad, homeLoad, loginVerifyUser,
+    logoutUser, forgetLoad, forgetVerify, resetPasswordLoad, resetPassword, secondUserVerification,
+    secondUserVerificationLink, editUserLoad,editUser } = require('../controllers/userController');
 
 
 userRoute.use(nocache());
@@ -38,8 +40,10 @@ userRoute.get('/forget-password', resetPasswordLoad);
 
 userRoute.post('/forget-password', resetPassword)
 
-userRoute.get('/verification',secondUserVerification)
-userRoute.post('/verification',secondUserVerificationLink)
+userRoute.get('/verification', secondUserVerification)
+userRoute.post('/verification', secondUserVerificationLink)
 
+userRoute.get('/editUser',checkSession,editUserLoad);
+userRoute.post('/editUser',upload.single('image'),editUser)
 
 module.exports = userRoute;

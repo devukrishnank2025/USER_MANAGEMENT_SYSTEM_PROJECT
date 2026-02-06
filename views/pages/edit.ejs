@@ -1,0 +1,16 @@
+<%- include('../layout/header') %>
+
+<h1>this is the edit page</h1><br>
+<img  src="/userImages/<%=user.image%>" alt="<%= user.image %> " width="100px">
+<form action="/editUser" method="post" enctype="multipart/form-data">
+    <input type="text" name="name" value="<%= user.name %>"><br><br>
+    <input type="text" name="email" value="<%= user.email %>"><br><br>
+        <input type="file" name="image"> <br><br>
+
+    <input type="hidden" name="user_id" value="<%=user._id%>">
+    <input type="submit" value="confirm">
+</form>
+
+
+
+<%- include('../layout/footer') %>

@@ -1,7 +1,31 @@
 <%- include('../layout/header') %>
 
-<h1>this is the home page</h1><br><br><br>
+<h1>this is the home page</h1><br>
 
-<a href="/logout"><button>logout</button></a>
+<h3>welcome <%= user.name %></h3>
+
+<table>
+
+    <tr>
+        <img src="/userImages/<%=user.image%>" width="100px"  alt="<%=user.image%>">
+    </tr>
+    <tr>
+        <td>Name:</td>
+        <td><%= user.name%></td>
+    </tr>
+    <tr>
+        <td>email:</td>
+        <td><%= user.email%></td>
+    </tr>
+    <tr>
+        <td>verified:</td>
+        <td><% if(user.is_verified===1){
+            %><p>true</p><%
+        }%></td>
+    </tr>
+</table>
+
+<a href="/logout"><button>logout</button></a><br><br>
+<a href="/editUser?id=<%=user._id%>"><button>edit profile</button></a>
 
 <%- include('../layout/footer') %>
