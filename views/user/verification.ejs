@@ -1,0 +1,17 @@
+<%- include('../layout/header') %>
+
+
+    <form action="/verification" method="post">
+
+        <% if(typeof message!=='undefined' ){ %>
+            <p>
+                <%= message %>
+            </p>
+            <% } %>
+                <input type="email" name="email" placeholder="Enter Email"><br><br>
+                <input type="submit" value="Sent verification link">
+    </form>
+
+
+
+    <%- include('../layout/footer') %>

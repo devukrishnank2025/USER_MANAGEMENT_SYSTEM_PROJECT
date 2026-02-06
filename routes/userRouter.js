@@ -1,7 +1,7 @@
 const express = require('express');
 const userRoute = express();
 const upload = require('../multerFile/multer');
-const { loadRegister, registrationUser, verifyUser, loginLoad, homeLoad, loginVerifyUser, logoutUser, forgetLoad, forgetVerify, resetPasswordLoad, resetPassword } = require('../controllers/userController');
+const { loadRegister, registrationUser, verifyUser, loginLoad, homeLoad, loginVerifyUser, logoutUser, forgetLoad, forgetVerify, resetPasswordLoad, resetPassword,secondUserVerification,secondUserVerificationLink } = require('../controllers/userController');
 const session = require('express-session');
 const config = require('../config/secretconfig');
 const { checkSession, isLogin } = require('../middleware/auth');
@@ -37,5 +37,9 @@ userRoute.post('/forget', forgetVerify);
 userRoute.get('/forget-password', resetPasswordLoad);
 
 userRoute.post('/forget-password', resetPassword)
+
+userRoute.get('/verification',secondUserVerification)
+userRoute.post('/verification',secondUserVerificationLink)
+
 
 module.exports = userRoute;
