@@ -1,0 +1,9 @@
+<%- include('../layout/header') %>
+
+<% if(typeof message!=='undefined'){
+    %><h3><%=message%></h3><%
+}%>
+<h1>this is admin home</h1>
+<a href="/admin/logout">logout</a>
+
+<%- include('../layout/footer') %>

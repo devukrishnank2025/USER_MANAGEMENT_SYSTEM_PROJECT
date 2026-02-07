@@ -1,0 +1,20 @@
+<%- include('../layout/header') %>
+
+<h1>admin login</h1>
+
+
+<% if(typeof message!=='undefined'){
+    %><h3><%=message%></h3><%
+}%>
+
+<form action="" method="post">
+    <input type="email" name="email" placeholder="enter email"><br><br>
+    <input type="password" name="password" placeholder="enter password"><br><br>
+    <input type="submit" value="login">
+</form><br>
+
+<a href="/admin/forget">forget password</a>
+
+
+
+<%- include('../layout/footer') %>

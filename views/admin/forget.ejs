@@ -1,0 +1,14 @@
+<%- include('../layout/header') %>
+
+<% if(typeof message!=='undefined'){
+    %><h3><%=message%></h3><%
+}%>
+<h1>this is admin forget</h1>
+
+
+<form action="" method="post">
+    <input type="email" name="email" placeholder="enter email"><br><br>
+    <input type="submit" value="sent forget mail">
+
+</form>
+<%- include('../layout/footer') %>
